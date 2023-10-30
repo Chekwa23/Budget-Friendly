@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, InputGroup } from "react-bootstrap";
 import { dbGet, dbSet } from "./database";
-import { FaPlus, FaTrashAlt } from "react-icons/fa";
+import {
+  FaEquals,
+  FaMinus,
+  FaPiggyBank,
+  FaPlus,
+  FaTrashAlt,
+} from "react-icons/fa";
 
 function App() {
   const [income, setIncome] = useState(0);
   const [billSum, setBillSum] = useState(0);
   const [takeHome, setTakeHome] = useState(0);
+  const [afterPay, setAfterPay] = useState(0);
 
   const [billList, setBillList] = useState([]);
 
@@ -52,12 +59,15 @@ function App() {
   }
 
   useEffect(() => {
-    let temp = Number(0);
+    let sumingBill = Number(0);
+    let sumingAfterPay = Number(0);
     billList.forEach((bill) => {
-      temp += Number(bill.cost);
+      sumingBill += Number(bill.cost);
+      !bill.paid && (sumingAfterPay += Number(bill.cost));
     });
-    setBillSum(temp);
-    setTakeHome(income - temp);
+    setBillSum(sumingBill);
+    setTakeHome(income - sumingBill);
+    setAfterPay(sumingAfterPay);
   }, [billList, income]);
 
   function sortList(listToSort) {
@@ -76,20 +86,24 @@ function App() {
 
   return (
     <div className="bg-dark min-vh-100 px-2">
-      <div className="fs-2 fw-bold text-light d-flex flex-row justify-content-center">
-        $
+      <div className="pt-2 fs-2 fw-bold text-light d-flex flex-row justify-content-center align-items-center gap-1">
         {edit ? (
-          <span>{income}</span>
+          <span>${income}</span>
         ) : (
           <span>
-            <Form.Control
-              type="number"
-              value={income}
-              onChange={(e) => setIncome(e.target.value)}
-            />
+            <InputGroup className="">
+              <InputGroup.Text>Pay $</InputGroup.Text>
+              <Form.Control
+                type="number"
+                value={income}
+                onChange={(e) => setIncome(e.target.value)}
+              />
+            </InputGroup>
           </span>
-        )}{" "}
-        - <span className="text-danger">${billSum}</span> ={" "}
+        )}
+        <FaMinus size={15} />
+        <span className="text-danger">${billSum}</span>
+        <FaEquals size={15} />
         <span className={takeHome > 0 ? "text-success" : "text-danger"}>
           ${takeHome}
         </span>
@@ -98,6 +112,11 @@ function App() {
         <Button variant="outline-secondary" onClick={() => onReset()}>
           Reset
         </Button>
+        <div className="d-flex flex-row align-items-center fs-2 fw-bold text-light gap-2">
+          <FaPiggyBank />
+          <span>{afterPay}</span>
+        </div>
+
         {edit ? (
           <Button variant="outline-secondary" onClick={() => setEdit(false)}>
             Edit
