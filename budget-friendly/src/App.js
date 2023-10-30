@@ -73,14 +73,17 @@ function App() {
 
   function sortList(listToSort) {
     return listToSort.sort((a, b) => {
-      if (a.date === "" && b.date === "") {
+      let tempA = a.date.replace(/\D/g, "");
+      let tempB = b.date.replace(/\D/g, "");
+
+      if (tempA === "" && tempB === "") {
         return 0; // Keep the order of empty strings as they are
-      } else if (a.date === "") {
+      } else if (tempA === "") {
         return 1; // Place empty strings at the end
-      } else if (b.date === "") {
+      } else if (tempB === "") {
         return -1; // Place empty strings at the end
       } else {
-        return a.date.localeCompare(b.date); // Sort non-empty strings
+        return tempA.localeCompare(tempB); // Sort non-empty strings
       }
     });
   }
