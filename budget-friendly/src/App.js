@@ -8,16 +8,16 @@ import {
   FaPlus,
   FaTrashAlt,
 } from "react-icons/fa";
+import ConfettiExplosion from "react-confetti-explosion";
 
 function App() {
   const [income, setIncome] = useState(0);
   const [billSum, setBillSum] = useState(0);
   const [takeHome, setTakeHome] = useState(0);
   const [afterPay, setAfterPay] = useState(0);
-
   const [billList, setBillList] = useState([]);
-
   const [edit, setEdit] = useState(true);
+  const [isExploding, setIsExploding] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -39,6 +39,7 @@ function App() {
 
   async function onSave() {
     setEdit(true);
+    billList.every((item) => item.paid) && setIsExploding(true);
     await dbSet("billList", billList);
     await dbSet("income", income);
   }
@@ -86,6 +87,7 @@ function App() {
 
   return (
     <div className="bg-dark min-vh-100 px-2">
+      <>{isExploding && <ConfettiExplosion duration={3000} />}</>
       <div className="pt-2 fs-2 fw-bold text-light d-flex flex-row justify-content-center align-items-center gap-1">
         {edit ? (
           <span>${income}</span>
@@ -114,11 +116,17 @@ function App() {
         </Button>
         <div className="d-flex flex-row align-items-center fs-2 fw-bold text-light gap-2">
           <FaPiggyBank />
-          <span>{afterPay}</span>
+          <span className="text-danger">${afterPay}</span>
         </div>
 
         {edit ? (
-          <Button variant="outline-secondary" onClick={() => setEdit(false)}>
+          <Button
+            variant="outline-secondary"
+            onClick={() => {
+              setIsExploding(false);
+              setEdit(false);
+            }}
+          >
             Edit
           </Button>
         ) : (
