@@ -72,18 +72,23 @@ function App() {
   }, [billList, income]);
 
   function sortList(listToSort) {
+    if (!edit) {
+      return listToSort;
+    }
     return listToSort.sort((a, b) => {
       let tempA = a.date.replace(/\D/g, "");
       let tempB = b.date.replace(/\D/g, "");
 
       if (tempA === "" && tempB === "") {
         return 0; // Keep the order of empty strings as they are
-      } else if (tempA === "") {
+      } else if (tempA === "" || parseInt(tempA) > parseInt(tempB)) {
         return 1; // Place empty strings at the end
-      } else if (tempB === "") {
+      } else if (tempB === "" || parseInt(tempA) < parseInt(tempB)) {
         return -1; // Place empty strings at the end
       } else {
-        return tempA.localeCompare(tempB); // Sort non-empty strings
+        return parseInt(tempA) < parseInt(tempB); // Sort non-empty strings
+
+        // return tempA.localeCompare(tempB); // Sort non-empty strings
       }
     });
   }
